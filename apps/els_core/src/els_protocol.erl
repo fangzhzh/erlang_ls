@@ -16,6 +16,7 @@
 
 %% Data Structures
 -export([ range/1
+        , range_line/1
         ]).
 
 %%==============================================================================
@@ -77,6 +78,12 @@ error(RequestId, Error) ->
 range(#{ from := {FromL, FromC}, to := {ToL, ToC} }) ->
   #{ start => #{line => FromL - 1, character => FromC - 1}
    , 'end' => #{line => ToL - 1,   character => ToC - 1}
+   }.
+
+-spec range_line(poi_range()) -> range().
+range_line(#{ from := {FromL, _}, to := {ToL, _} }) ->
+  #{ start => #{line => FromL - 1, character => 0}
+   , 'end' => #{line => ToL,   character => 1}
    }.
 
 %%==============================================================================
