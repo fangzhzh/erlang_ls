@@ -138,16 +138,17 @@ action_fix_module_name(Uri, Range0, [ModName, FileName]) ->
 
 - spec action_remove_macro(uri(), range(), [binary()]) -> [map()].
 action_remove_macro(Uri, Range, [Macro]) ->
-  %% Supply a quickfix to remove the unusued Macro
+  %% Supply a quickfix to remove the unused Macro
   {ok, Document} = els_utils:lookup_document(Uri),
   POIs = els_poi:sort(els_dt_document:pois(Document, [define])),
   case ensure_range(els_range:to_poi_range(Range), Macro, POIs) of
     {ok, MacroRange} ->
+      LineRange = els_range:line(MacroRange),
       [ make_edit_action( Uri
-                        , <<"Remove unsued macro ", Macro/binary, ".">>
+                        , <<"Remove unused macro ", Macro/binary, ".">>
                         , ?CODE_ACTION_KIND_QUICKFIX
                         , <<"">>
-                        , els_protocol:range_line(MacroRange)) ];
+                        , els_protocol:range(LineRange)) ];
     error ->
       []
   end.

@@ -14,7 +14,7 @@
         , export_unused_function/1
         , suggest_variable/1
         , fix_module_name/1
-        , action_remove_macro/1
+        , remove_unused_macro/1
         ]).
 
 %%==============================================================================
@@ -162,11 +162,11 @@ fix_module_name(Config) ->
   ?assertEqual(Expected, Result),
   ok.
 
--spec action_remove_macro(config()) -> ok.
-action_remove_macro(Config) ->
+-spec remove_unused_macro(config()) -> ok.
+remove_unused_macro(Config) ->
   Uri = ?config(code_action_uri, Config),
   Range = els_protocol:range(#{from => {?COMMENTS_LINES+17, 9}, to => {?COMMENTS_LINES+17, 15}}),
-  RangeLine = els_protocol:range_line(#{from => {?COMMENTS_LINES+17, 9}, to => {?COMMENTS_LINES+17, 15}}),
+  LineRange = els_range:line(#{from => {?COMMENTS_LINES+17, 9}, to => {?COMMENTS_LINES+17, 15}}),
   Diag = #{ message  => <<"Unused macro: TIMEOUT">>
           , range    => Range
           , severity => 2
@@ -176,12 +176,12 @@ action_remove_macro(Config) ->
   Expected =
     [ #{ edit => #{changes =>
                      #{ binary_to_atom(Uri, utf8) =>
-                          [#{ range => RangeLine
+                          [#{ range => els_protocol:range(LineRange)
                             , newText => <<"">>
                             }]
                       }}
        , kind => <<"quickfix">>
-       , title => <<"Remove unsued macro TIMEOUT.">>
+       , title => <<"Remove unused macro TIMEOUT.">>
        }
     ],
   ?assertEqual(Expected, Result),
